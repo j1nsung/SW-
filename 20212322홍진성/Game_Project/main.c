@@ -20,16 +20,7 @@ struct
 	int x, y;
 }Bullet[MAXBULLET];
 
-void textcolor(int Text_Color, int Background_Color);
-void removeCursor(void);
-void gotoxy(int x, int y);
-void StartMenu(void);
-void Help(void);
-void Game_Start(void);
-void Init_Game(void);
-void playererase(int x, int y);
-void palyerdraw(int x, int y);
-void Player_Move(ch);
+
 int Delay = 10;
 int Frame_Count = 0;
 int P1_Frame_Sync = 4;
@@ -39,7 +30,7 @@ int newx = UX, newy = UY; //플레이어의 new 좌표
 int keep_moving = 1;  //1:계속이동
 int x;
 int y;
-unsigned char ch;
+unsigned char nKey;
 
 void textcolor(int Text_Color, int Background_Color)
 //Text_Color는 글자의 색상
@@ -74,9 +65,15 @@ enum Keys { //수업중에 사용한 키보드 함수를 복붙, 문제시 #define을 이용
 	DOWN = 80,
 	SPACEBAR = 32,
 	SPECIAL1 = 0xE0, // 0xE0 값 추가
-	SPECIAL2 = 0x00,  // 0x00 값 추가
-	SPACE = 0x20, // 0X20 값 추가
+	SPECIAL2 = 0x00  // 0x00 값 추가
 };
+
+void gotoxy(int x, int y) { //좌표를 지정해주는 함수
+	COORD pos = { x, y };
+	//x 는 가로 좌표값
+	//y는 세로 좌표값
+	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
+}
 
 void Help() {
 	system("cls"); //화면 지우기
@@ -90,6 +87,119 @@ void Help() {
 	printf("너의 가슴이 시키는대로 눌러라...\n\n\n\n");
 	
 	system("pause"); //help 종료	
+}
+
+void removeCursor(void) { //마우스 깜빡거리는 것을 없에는 함수
+	CONSOLE_CURSOR_INFO cursorInfo; //cursorInfo를 선언
+	GetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cursorInfo);
+	cursorInfo.bVisible = 0;
+	SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cursorInfo);
+}
+
+
+void Init_Game() {
+	system("cls");
+	removeCursor();
+}
+
+void playerdraw(int x, int y) {
+	textcolor(GREEN, BLACK);
+	gotoxy(x, y);
+	printf("<<=♥==>");
+}
+
+void playererase(int x, int y) {
+	gotoxy(x, y);
+	printf("   ");
+}
+
+void Player_Move(unsigned char Keys) {
+	int move_flag = 0;
+	static unsigned char last_ch = 0;
+
+
+	if (called == 0) {
+		removeCursor();
+		playerdraw(oldx, oldy);
+		called = 1;
+	}
+	if (keep_moving && Keys == 0)
+		Keys = last_ch;
+	last_ch = Keys;
+
+
+	switch (Keys) {
+	case UP: // 방향키 윗키를 누르면 위로 위치값 변경
+		if (oldy > 25)
+			newy = oldy - 1;
+		move_flag = 1;
+		break;
+	case DOWN: // 방향키 아랫키를 누르면 아래로 위치값 변경
+		if (oldy < HEIGHT - 3)
+			newy = oldy + 1;
+		move_flag = 1;
+		break;
+	case LEFT: // 방향키 왼쪽키를 누르면 왼쪽으로 위치값 변경
+		if (oldx > 2)
+			newx = oldx - 1;
+		move_flag = 1;
+		break;
+	case RIGHT: // 방향키 오른쪽키를 누르면 오른쪽으로 위치값 변경
+		if (oldx < WIDTH - 6)
+			newx = oldx + 1;
+		move_flag = 1;
+		break;
+	}
+	if (move_flag) {
+		playererase(oldx, oldy);
+		playerdraw(newx, newy);
+		oldx = newx;
+		oldy = newy;
+	}
+}
+
+void Game_Start() { //게임을 시작 시키는 함수
+	unsigned char nKey;
+	int i;
+
+	Init_Game(); //재시작시 초기화 해주는 함수
+
+	while (1) {
+		if (_kbhit() == 1) {
+			nKey = _getch();
+			if (nKey == SPECIAL1 || nKey == SPECIAL2) {
+				nKey = _getch();
+				switch (nKey) {
+				case UP:
+				case DOWN:
+				case LEFT:
+				case RIGHT: //키보드를 이용하여 플레이어 위치 변경
+					Player_Move(nKey);
+					if (Frame_Count % P1_Frame_Sync == 0)
+						Player_Move(0);
+					break;
+				default:
+					if (Frame_Count % P1_Frame_Sync == 0)
+						Player_Move(0);
+
+				}
+			}
+			if (nKey == SPACEBAR) {
+				for (i = 0; i < MAXBULLET && Bullet[i].exist == TRUE; i++) {}
+				if (i != MAXBULLET) {
+					Bullet[i].x = newx + 1;
+					Bullet[i].y = newy - 1;
+					Bullet[i].exist = TRUE;
+				}
+			}
+		}
+
+		else {
+			//Player_Move 함수 속도 조절
+		}
+		Sleep(Delay); //Delay 값 줄이기
+		Frame_Count++; //Frame_count 값으로 속도 조절
+	}
 }
 
 void StartMenu() {
@@ -122,56 +232,18 @@ void StartMenu() {
 	}
 }
 
-void Game_Start() { //게임을 시작 시키는 함수
-	unsigned char ch;
-	
-	int i;
-	Init_Game(); //재시작시 초기화 해주는 함수
-		while (1) {
-			if (_kbhit() == 1) {
-				ch = _getch();
-				if (ch == SPECIAL1 || ch == SPECIAL2) {
-					ch = _getch();
-					switch (ch) {
-					case UP: case DOWN: case LEFT: case RIGHT: //키보드를 이용하여 플레이어 위치 변경
-						Player_Move(ch);
-						if (Frame_Count % P1_Frame_Sync == 0)
-							Player_Move(0);
-						break;
-					default:
-						if (Frame_Count % P1_Frame_Sync == 0)
-							Player_Move(0);
 
-					}
-				}
-				if (ch == SPACE) {
-					for (i = 0; i < MAXBULLET && Bullet[i].exist == TRUE; i++) {}
-					if (i != MAXBULLET) {
-						Bullet[i].x = newx + 1;
-						Bullet[i].y = newy - 1;
-						Bullet[i].exist = TRUE;
-					}
-				}
-			}
-			
-			else {
-				//Player_Move 함수 속도 조절
-			}
-			Sleep(Delay); //Delay 값 줄이기
-			Frame_Count++; //Frame_count 값으로 속도 조절
-		}
-}
 
-void Init_Game() {
-	system("cls");
-	removeCursor();
-}
 
-void playerdraw(int x, int y) {
-	textcolor(GREEN, BLACK);
-	gotoxy(x, y);
-	printf("<<=♥==>");
-}
+
+
+
+
+
+
+
+
+
 
 void DrawBullet(int i) {
 	textcolor(GREEN, BLACK);
@@ -193,76 +265,13 @@ void Bullet_Move() {
 			if (Bullet[i].y == 0) {
 				Bullet[i].exist = FALSE;
 			}
-			else {
+			else 
+			{
 				Bullet[i].y--;
 				DrawBullet(i);
 			}
 		}
-	}
-}
-
-void Player_Move(unsigned char key) {
-	int move_flag = 0;
-	static unsigned char last_ch = 0;
-
-
-	if (called == 0) {
-		removeCursor();
-		playerdraw(oldx, oldy);
-		called = 1;
-	}
-	if (keep_moving && ch == 0)
-		ch = last_ch;
-	last_ch = ch;
-
-
-	switch (ch) {
-	case UP: // 방향키 윗키를 누르면 위로 위치값 변경
-		if (oldy > 25)
-			newy = oldy - 1;
-		move_flag = 1;
-		break;
-	case DOWN: // 방향키 아랫키를 누르면 아래로 위치값 변경
-		if (oldy < HEIGHT - 3)
-			newy = oldy + 1;
-		move_flag = 1;
-		break;
-	case LEFT: // 방향키 왼쪽키를 누르면 왼쪽으로 위치값 변경
-		if (oldx > 2)
-			newx = oldx - 1;
-		move_flag = 1;
-		break;
-	case RIGHT: // 방향키 오른쪽키를 누르면 오른쪽으로 위치값 변경
-		if (oldx < WIDTH - 6)
-			newx = oldx + 1;
-		move_flag = 1;
-		break;
-	}
-	if (move_flag) {
-		playererase(oldx, oldy);
-		playerdraw(newx, newy); 
-		oldx = newx;
-		oldy = newy;
-	}
-}
-
-void playererase(int x, int y) {
-	gotoxy(x, y);
-	printf("   ");
-}
-
-void removeCursor(void) { //마우스 깜빡거리는 것을 없에는 함수
-	CONSOLE_CURSOR_INFO cursorInfo; //cursorInfo를 선언
-	GetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cursorInfo);
-	cursorInfo.bVisible = 0;
-	SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cursorInfo);
-}
-
-void gotoxy(int x, int y) { //좌표를 지정해주는 함수
-	COORD pos = { x, y };
-	//x 는 가로 좌표값
-	//y는 세로 좌표값
-	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
+	}	
 }
 
 int main() {
