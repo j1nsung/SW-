@@ -5,11 +5,25 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+#define WIDTH 62
+#define HEIGHT 48
+#define UX 30  //시작 유저의 x좌표
+#define UY 45  //시작 유저의 y좌표
+
 void textcolor(int Text_Color, int Background_Color);
 void removeCursor(void);
 void gotoxy(int x, int y);
 void StartMenu(void);
-void help(void);
+void Help(void);
+void Game_Start(void);
+void Init_Game(void);
+int Delay = 10;
+int Frame_Count = 0;
+int P1_Frame_Sync = 4;
+int called = 0;
+int oldx = UX, oldy = UY; // 플레이어의 old 좌표
+int newx = UX, newy = UY; //플레이어의 new 좌표
+int keep_moving = 1;  //1:계속이동
 
 void textcolor(int Text_Color, int Background_Color)
 //Text_Color는 글자의 색상
@@ -39,14 +53,15 @@ typedef enum Color { //수업 중에 사용한 컬러 함수를 복붙, 문제시 #define을 이용
 
 enum Keys { //수업중에 사용한 키보드 함수를 복붙, 문제시 #define을 이용
 	LEFT = 75,
-	Right = 77,
+	RIGHT = 77,
 	UP = 72,
 	DOWN = 80,
-	ARROW = 224,
-	SPACEBAR = 32
+	SPACEBAR = 32,
+	SPECIAL1 = 0xE0, // 0xE0 값 추가
+	SPECIAL2 = 0x00  // 0x00 값 추가
 };
 
-void help() {
+void Help() {
 	system("cls"); //화면 지우기
 	
 	gotoxy(5, 10);
@@ -77,11 +92,11 @@ void StartMenu() {
 		scanf_s("%d", &a);
 
 		if (a == 1) { //키보드 1 입력시 게임 시작
-			//gamestart();
+			Game_Start();
 			break;
 		}
 		else if (a == 2) { // 키보드 2 입력시 도움말 출력
-			help();
+			Help();
 		}
 		else if (a == 3) { // 키보드 3 입력시 게임 종료
 			printf("종료");
@@ -90,7 +105,39 @@ void StartMenu() {
 	}
 }
 
+void Game_Start() { //게임을 시작 시키는 함수
+	unsigned char ch;
+	Init_Game(); //재시작시 초기화 해주는 함수
+		while (1) {
+			if (kbhit() == 1) {
+				ch = getch();
+				if (ch == SPECIAL1 || ch == SPECIAL2) {
+					ch = getch();
+					switch (ch) {
+					case UP: case DOWN: case LEFT: case RIGHT: //키보드를 이용하여 플레이어 위치 변경
+						Player_Move(ch);
+						if (Frame_Count % P1_Frame_Sync == 0)
+							Player_Move(0);
+						break;
+					default:
+						if (Frame_Count % P1_Frame_Sync == 0)
+							Player_Move(0);
 
+					}
+				}
+			}
+			else {
+
+			}
+			Sleep(Delay); //Delay 값 줄이기
+			Frame_Count++; //Frame_count 값으로 속도 조절
+		}
+}
+
+void Init_Game() {
+	system("cls");
+	removeCursor();
+}
 
 void removeCursor(void) { //마우스 깜빡거리는 것을 없에는 함수
 	CONSOLE_CURSOR_INFO cursorInfo; //cursorInfo를 선언
