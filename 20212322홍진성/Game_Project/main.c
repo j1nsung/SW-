@@ -32,8 +32,12 @@ typedef enum Color { //수업 중에 사용한 컬러 함수를 복붙, 문제시 #define을 이용
 }COLOR;
 
 int main() {
-	srand(time(NULL));
+	srand(time(NULL)); //매번 같은 값을 출력
 	textcolor(YELLOW, BLACK); //컬러 지정
+	removeCursor(); //removeCursor 불러옴
+	gotoxy(8, 20); //출력될 문장 좌표값 지정
+	printf("뿅뿅특공대"); 
+	StartMenu();
 }
 
 void removeCursor(void) { //마우스 깜빡거리는 것을 없에는 함수
