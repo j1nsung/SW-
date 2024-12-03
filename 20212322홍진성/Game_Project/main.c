@@ -4,6 +4,7 @@
 #include <time.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#define _CRT_SECURE_NO_WARNINGS
 
 #define WIDTH 62
 #define HEIGHT 48
@@ -137,6 +138,50 @@ void Game_Start() { //게임을 시작 시키는 함수
 void Init_Game() {
 	system("cls");
 	removeCursor();
+}
+
+void Playr_Move() {
+	int move_flag = 0;
+	static unsigned char last_ch = 0;
+
+	if (called == 0) {
+		removeCursor();
+		playerdraw(oldx, oldy);
+		called = 1;
+	}
+
+	if (keep_moving && ch == 0)
+		ch = last_ch;
+	last_ch = ch;
+
+	switch (ch) {
+	case UP:
+		if (oldy > 25)
+			newy = oldy - 1;
+		move_flag = 1;
+		break;
+	case DOWN:
+		if (oldy < HEIGHT - 3)
+			newy = oldy + 1;
+		move_flag = 1;
+		break;
+	case LEFT:
+		if (oldx > 2)
+			newx = oldx - 1;
+		move_flag = 1;
+		break;
+	case RIGHT:
+		if (oldx < WIDTH - 6)
+			newx = oldx + 1;
+		move_flag = 1;
+		break;
+	}
+	if (move_flag) {
+		playererase(oldx, oldy);
+		playerdraw(newx, newy);
+		oldx = newx;
+		oldy = newy;
+	}
 }
 
 void removeCursor(void) { //마우스 깜빡거리는 것을 없에는 함수
