@@ -48,7 +48,15 @@ enum Keys { //수업중에 사용한 키보드 함수를 복붙, 문제시 #define을 이용
 
 void help() {
 	system("cls"); //화면 지우기
-	//gotoxy() 함수 이용하여 도움말 출력하기
+	
+	gotoxy(5, 10);
+	printf("남자들에게는 가끔가슴이 울리는 조작법들이 있다...");
+
+	gotoxy(15, 14);
+	printf("절대 도움을 받아선 안돼... ");
+	gotoxy(13, 18);
+	printf("너의 가슴이 시키는대로 눌러라...\n\n\n\n");
+	
 	system("pause"); //help 종료	
 }
 
@@ -58,10 +66,8 @@ void StartMenu() {
 		system("cls");
 		gotoxy(8, 2);
 		printf("뿅뿅특공대!");
-
 		gotoxy(8, 5);
 		printf("게임시작(1)");
-
 		gotoxy(9, 9);
 		printf("도움말(2)");
 		gotoxy(10, 13);
