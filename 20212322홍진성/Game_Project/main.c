@@ -36,6 +36,7 @@ int main() {
 }
 
 void removeCursor(void) { //마우스 깜빡거리는 것을 없에는 함수
+	CONSOLE_CURSOR_INFO cursorInfo;
 	GetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cursorInfo);
 	cursorInfo.bVisible = 0;
 	SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cursorInfo);
