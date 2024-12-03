@@ -10,6 +10,15 @@
 #define HEIGHT 48
 #define UX 30  //시작 유저의 x좌표
 #define UY 45  //시작 유저의 y좌표
+#define MAXBULLET 6
+#define TRUE 1
+#define FALSE 0
+
+struct 
+{
+	int exist;
+	int x, y;
+}Bullet[MAXBULLET];
 
 void textcolor(int Text_Color, int Background_Color);
 void removeCursor(void);
@@ -18,6 +27,8 @@ void StartMenu(void);
 void Help(void);
 void Game_Start(void);
 void Init_Game(void);
+void playererase(int x, int y);
+void palyerdraw();
 int Delay = 10;
 int Frame_Count = 0;
 int P1_Frame_Sync = 4;
@@ -25,6 +36,9 @@ int called = 0;
 int oldx = UX, oldy = UY; // 플레이어의 old 좌표
 int newx = UX, newy = UY; //플레이어의 new 좌표
 int keep_moving = 1;  //1:계속이동
+int x;
+int y;
+unsigned char ch;
 
 void textcolor(int Text_Color, int Background_Color)
 //Text_Color는 글자의 색상
@@ -59,7 +73,8 @@ enum Keys { //수업중에 사용한 키보드 함수를 복붙, 문제시 #define을 이용
 	DOWN = 80,
 	SPACEBAR = 32,
 	SPECIAL1 = 0xE0, // 0xE0 값 추가
-	SPECIAL2 = 0x00  // 0x00 값 추가
+	SPECIAL2 = 0x00,  // 0x00 값 추가
+	SPACE = 0x20, // 0X20 값 추가
 };
 
 void Help() {
@@ -108,6 +123,8 @@ void StartMenu() {
 
 void Game_Start() { //게임을 시작 시키는 함수
 	unsigned char ch;
+
+	int i;
 	Init_Game(); //재시작시 초기화 해주는 함수
 		while (1) {
 			if (kbhit() == 1) {
@@ -126,9 +143,18 @@ void Game_Start() { //게임을 시작 시키는 함수
 
 					}
 				}
+				if (ch == SPACE) {
+					for (i = 0; i < MAXBULLET && Bullet[i].exist == TRUE; i++) {}
+					if (i != MAXBULLET) {
+						Bullet[i].x = newx + 1;
+						Bullet[i].y = newy - 1;
+						Bullet[i].exist = TRUE;
+					}
+				}
 			}
+			
 			else {
-
+				//Player_Move 함수 속도 조절
 			}
 			Sleep(Delay); //Delay 값 줄이기
 			Frame_Count++; //Frame_count 값으로 속도 조절
@@ -138,6 +164,23 @@ void Game_Start() { //게임을 시작 시키는 함수
 void Init_Game() {
 	system("cls");
 	removeCursor();
+}
+
+void playerdraw() {
+	textcolr(GREEN, BLACK);
+	gotoxy(x, y);
+	printf("<<=♥==>");
+}
+
+void DrawBullet(int i) {
+	textcolor(GREEN, BLACK);
+	gotoxy(Bullet[i].x, Bullet[i].y);
+	printf(" | ");
+}
+
+void EraseBullet(int i) {
+	gotoxy(Bullet[i].x, Bullet[i].y);
+	printf("   ");
 }
 
 void Playr_Move() {
@@ -155,22 +198,22 @@ void Playr_Move() {
 	last_ch = ch;
 
 	switch (ch) {
-	case UP:
+	case UP: // 방향키 윗키를 누르면 위로 위치값 변경
 		if (oldy > 25)
 			newy = oldy - 1;
 		move_flag = 1;
 		break;
-	case DOWN:
+	case DOWN: // 방향키 아랫키를 누르면 아래로 위치값 변경
 		if (oldy < HEIGHT - 3)
 			newy = oldy + 1;
 		move_flag = 1;
 		break;
-	case LEFT:
+	case LEFT: // 방향키 왼쪽키를 누르면 왼쪽으로 위치값 변경
 		if (oldx > 2)
 			newx = oldx - 1;
 		move_flag = 1;
 		break;
-	case RIGHT:
+	case RIGHT: // 방향키 오른쪽키를 누르면 오른쪽으로 위치값 변경
 		if (oldx < WIDTH - 6)
 			newx = oldx + 1;
 		move_flag = 1;
@@ -178,10 +221,15 @@ void Playr_Move() {
 	}
 	if (move_flag) {
 		playererase(oldx, oldy);
-		playerdraw(newx, newy);
+		playerdraw(newx, newy); 
 		oldx = newx;
 		oldy = newy;
 	}
+}
+
+void playererase(int x, int y) {
+	gotoxy(x, y);
+	printf("   ");
 }
 
 void removeCursor(void) { //마우스 깜빡거리는 것을 없에는 함수
