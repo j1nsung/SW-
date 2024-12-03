@@ -34,3 +34,9 @@ int main() {
 	srand(time(NULL));
 	textcolor(YELLOW, BLACK);
 }
+
+void removeCursor(void) { //마우스 깜빡거리는 것을 없에는 함수
+	GetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cursorInfo);
+	cursorInfo.bVisible = 0;
+	SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cursorInfo);
+}
