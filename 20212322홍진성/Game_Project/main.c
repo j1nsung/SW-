@@ -28,7 +28,8 @@ void Help(void);
 void Game_Start(void);
 void Init_Game(void);
 void playererase(int x, int y);
-void palyerdraw();
+void palyerdraw(int x, int y);
+void Player_Move(ch);
 int Delay = 10;
 int Frame_Count = 0;
 int P1_Frame_Sync = 4;
@@ -123,14 +124,14 @@ void StartMenu() {
 
 void Game_Start() { //게임을 시작 시키는 함수
 	unsigned char ch;
-
+	
 	int i;
 	Init_Game(); //재시작시 초기화 해주는 함수
 		while (1) {
-			if (kbhit() == 1) {
-				ch = getch();
+			if (_kbhit() == 1) {
+				ch = _getch();
 				if (ch == SPECIAL1 || ch == SPECIAL2) {
-					ch = getch();
+					ch = _getch();
 					switch (ch) {
 					case UP: case DOWN: case LEFT: case RIGHT: //키보드를 이용하여 플레이어 위치 변경
 						Player_Move(ch);
@@ -166,8 +167,8 @@ void Init_Game() {
 	removeCursor();
 }
 
-void playerdraw() {
-	textcolr(GREEN, BLACK);
+void playerdraw(int x, int y) {
+	textcolor(GREEN, BLACK);
 	gotoxy(x, y);
 	printf("<<=♥==>");
 }
@@ -183,19 +184,37 @@ void EraseBullet(int i) {
 	printf("   ");
 }
 
-void Playr_Move() {
+void Bullet_Move() {
+	int i;
+
+	for (i = 0; i < MAXBULLET; i++) {
+		if (Bullet[i].exist == TRUE) {
+			EraseBullet(i);
+			if (Bullet[i].y == 0) {
+				Bullet[i].exist = FALSE;
+			}
+			else {
+				Bullet[i].y--;
+				DrawBullet(i);
+			}
+		}
+	}
+}
+
+void Player_Move(unsigned char key) {
 	int move_flag = 0;
 	static unsigned char last_ch = 0;
+
 
 	if (called == 0) {
 		removeCursor();
 		playerdraw(oldx, oldy);
 		called = 1;
 	}
-
 	if (keep_moving && ch == 0)
 		ch = last_ch;
 	last_ch = ch;
+
 
 	switch (ch) {
 	case UP: // 방향키 윗키를 누르면 위로 위치값 변경
