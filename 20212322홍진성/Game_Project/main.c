@@ -5,6 +5,14 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+#define SPECIAL1 0XE0
+#define SPECIAL2 0x00
+#define SPACEBAR 0x20
+#define UP 0x48
+#define DOWN 0x50
+#define LEFT 0x4b
+#define RIGHT 0x4d
+
 void textcolor(int Text_Color, int Background_Color)
 //Text_Color는 글자의 색상
 //Background_Color는 배경의 색상을 변경
@@ -30,16 +38,6 @@ typedef enum Color { //수업 중에 사용한 컬러 함수를 복붙, 문제시 #define을 이용
 	YELLOW,
 	WHITE,
 }COLOR;
-
-enum Keys { //수업중에 사용한 키보드 함수를 복붙, 문제시 #define을 이용
-	LEFT = 75,
-	RIGHT = 77,
-	UP = 72,
-	DOWN = 80,
-	SPACEBAR = 32,
-	SPECIAL1 = 0xE0, // 0xE0 값 추가
-	SPECIAL2 = 0x00  // 0x00 값 추가
-};
 
 int main() {
 	srand(time(NULL));
