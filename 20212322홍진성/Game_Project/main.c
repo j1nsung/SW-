@@ -256,18 +256,18 @@ void StartMenu() {
 	}
 }
 
-void DrawBullet(int i) {
+void DrawBullet(int i) { //총알 생성하는 함수
 	textcolor(GREEN, BLACK);
 	gotoxy(Bullet[i].x, Bullet[i].y);
 	printf("|");
 }
 
-void EraseBullet(int i) {
+void EraseBullet(int i) { //총알이 생성된 자리를 다시 지우는 함수
 	gotoxy(Bullet[i].x, Bullet[i].y);
 	printf(" ");
 }
 
-void Bullet_Move() {
+void Bullet_Move() { //총알이 나가는 궤도를 y 좌표를 1 올리면서 진행
 	int i;
 
 	for (i = 0; i < MAXBULLET; i++) {
@@ -307,6 +307,35 @@ void Show_Enermy() {
 	}
 }
 
+void Enermy_Move() {
+	int i;
+	for (i = 0; i < MAXENERMY; i++) {
+		if (Enermy[i].exist == TRUE) {
+			if (Enermy[i].type == -1) {
+				gotoxy(Enermy[i].x - 1, Enermy[i].y);
+				printf("          ");
+				Enermy[i].exist = FALSE;
+				continue;
+			}
+			if (Enermy[i].x > 52) {
+				Enermy[i].x -= 1;
+				Enermy[i].move = -1;
+			}
+			else if (Enermy[i].x <= 3) {
+				Enermy[i].move = 1;
+				Enermy[i].x += 1;
+				gotoxy(Enermy[i].x, Enermy[i].y);
+				printf(" ");
+			}
+			else {
+				Enermy[i].x += Enermy[i].move;
+				gotoxy(Enermy[i].x, Enermy[i].y);
+				printf(Enermy_Unit[Enermy[i].type]);
+				printf(" ");
+			}
+		}
+	}
+}
 int main() {
 	srand(time(NULL)); //매번 같은 값을 출력
 	textcolor(YELLOW, BLACK); //컬러 지정
