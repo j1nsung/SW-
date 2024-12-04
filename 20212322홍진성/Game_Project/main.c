@@ -35,6 +35,9 @@ void Bullet_Move();
 void Show_Enermy();
 int Enermy_Bullet_Use = 1;
 int Enermy_Bullet_frame_sync = 15;
+void Enermy_Move();
+void EnermyBullet_Show();
+
 
 struct
 {
@@ -190,6 +193,50 @@ void Player_Move(unsigned char nKey) {
 	}
 }
 
+void EnermyBullet_Show() {
+	int j;
+	int random = rand() % MAXENERMY;
+	for (j = 0; j < MAXENERMYBULLET && Enermy_Bullet[j].exist == TRUE; j++) {}
+	if (j != MAXENERMYBULLET && Enermy[random].exist == TRUE) {
+		Enermy_Bullet[j].x = Enermy[random].x + 2;
+		Enermy_Bullet[j].y = Enermy[random].y + 1;
+		Enermy_Bullet[j].exist = TRUE;
+	}
+}
+
+void EnemyBulletdraw(int i) {
+	textcolor(RED, BLACK);
+	gotoxy(Enermy_Bullet[i].x, Enermy_Bullet[i].y);
+	printf("*");
+}
+void EnemyBulleterase(int i) {
+	gotoxy(Enermy_Bullet[i].x, Enermy_Bullet[i].y);
+	printf(" ");
+}
+
+void EnemyBulletMove() {
+	int random;
+	random = 1;
+	for (int i = 0; i < MAXENERMYBULLET; i++) {
+		if (Enermy_Bullet[i].exist == TRUE) {
+			EnemyBulleterase(i);
+			if (Enermy_Bullet[i].y > HEIGHT - 3) {
+				Enermy_Bullet[i].exist = FALSE;
+			}
+			else {
+				if (random) {
+					if (Enermy_Bullet[i].x <= newx)
+						Enermy_Bullet[i].x++;
+					else
+						Enermy_Bullet[i].x--;
+				}
+				Enermy_Bullet[i].y++;
+				EnemyBulletdraw(i);
+			}
+		}
+	}
+}
+
 void Game_Start() { //게임을 시작 시키는 함수
 	unsigned char nKey;
 	int i;
@@ -220,11 +267,19 @@ void Game_Start() { //게임을 시작 시키는 함수
 					Bullet[i].exist = TRUE;
 				}
 			}
-			
 		}
-		else {
-			//Player_Move 함수 속도 조절
+		if (Frame_Count % 50 == 0) { //50프레임마다 적 생성
+			Show_Enermy();
 		}
+
+		Enermy_Move();
+
+		if (Frame_Count % Enermy_Bullet_frame_sync == 0) {
+			EnermyBullet_Show();
+		}
+
+		EnemyBulletMove();
+
 		Bullet_Move(); //총알 이동
 		Sleep(Delay); //Delay 값 줄이기
 		Frame_Count++; //Frame_count 값으로 속도 조절
@@ -342,16 +397,6 @@ void Enermy_Move() { //적의 움직임을 나타내는 함수
 	}
 }
 
-void EnermyBullet_Show() {
-	int j;
-	int random = rand() % MAXENERMY;
-	for(j = 0; j<MAXENERMYBULLET&&Enermy_Bullet[j].exist== TRUE; j++) {}
-	if (j != MAXENERMYBULLET && Enermy[random].exist == TRUE) {
-		Enermy_Bullet[j].x = Enermy[random].x + 2;
-		Enermy_Bullet[j].y = Enermy[random].y + 1;
-		Enermy_Bullet[j].exist = TRUE;
-	}
-}
 int main() {
 	srand(time(NULL)); //매번 같은 값을 출력
 	textcolor(YELLOW, BLACK); //컬러 지정
