@@ -6,8 +6,6 @@
 #include <stdbool.h>
 #define _CRT_SECURE_NO_WARNINGS
 
-
-
 #define SPECIAL1 0XE0
 #define SPECIAL2 0x00
 #define SPACEBAR 0x20
@@ -15,9 +13,6 @@
 #define DOWN 0x50
 #define LEFT 0x4b
 #define RIGHT 0x4d
-
-
-
 
 #define WIDTH 40
 #define HEIGHT 30
@@ -27,6 +22,7 @@
 #define TRUE 1
 #define FALSE 0
 #define MAXENERMY 6
+#define MAXENERMYBULLET 20
 
 int Delay = 10;
 int Frame_Count = 0;
@@ -36,6 +32,9 @@ int oldx = UX , oldy = UY; // 플레이어의 old 좌표
 int newx = UX, newy = UY; //플레이어의 new 좌표
 int keep_moving = 1;  //1:계속이동
 void Bullet_Move();
+void Show_Enermy();
+int Enermy_Bullet_Use = 1;
+int Enermy_Bullet_frame_sync = 15;
 
 struct
 {
@@ -51,6 +50,12 @@ struct
 	int move;
 	int type;
 }Enermy[MAXENERMY];
+
+struct 
+{
+	int exist;
+	int x, y;
+}Enermy_Bullet[MAXENERMYBULLET];
 
 char* Enermy_Unit[] = { "⊙★⊙","＠▒＠","♨▣♨","◐▼◑" };
 
@@ -307,14 +312,14 @@ void Show_Enermy() {
 	}
 }
 
-void Enermy_Move() {
+void Enermy_Move() { //적의 움직임을 나타내는 함수
 	int i;
 	for (i = 0; i < MAXENERMY; i++) {
 		if (Enermy[i].exist == TRUE) {
 			if (Enermy[i].type == -1) {
 				gotoxy(Enermy[i].x - 1, Enermy[i].y);
-				printf("          ");
-				Enermy[i].exist = FALSE;
+				printf("          "); //적이 맞아 죽었을때 삭제하는 오브젝트
+				Enermy[i].exist = FALSE; //위와 동일하게 죽었을 때 FALSE 값을 준다
 				continue;
 			}
 			if (Enermy[i].x > 52) {
@@ -334,6 +339,17 @@ void Enermy_Move() {
 				printf(" ");
 			}
 		}
+	}
+}
+
+void EnermyBullet_Show() {
+	int j;
+	int random = rand() % MAXENERMY;
+	for(j = 0; j<MAXENERMYBULLET&&Enermy_Bullet[j].exist== TRUE; j++) {}
+	if (j != MAXENERMYBULLET && Enermy[random].exist == TRUE) {
+		Enermy_Bullet[j].x = Enermy[random].x + 2;
+		Enermy_Bullet[j].y = Enermy[random].y + 1;
+		Enermy_Bullet[j].exist = TRUE;
 	}
 }
 int main() {
