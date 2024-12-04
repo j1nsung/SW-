@@ -31,6 +31,16 @@ typedef enum Color { //수업 중에 사용한 컬러 함수를 복붙, 문제시 #define을 이용
 	WHITE,
 }COLOR;
 
+enum Keys { //수업중에 사용한 키보드 함수를 복붙, 문제시 #define을 이용
+	LEFT = 75,
+	RIGHT = 77,
+	UP = 72,
+	DOWN = 80,
+	SPACEBAR = 32,
+	SPECIAL1 = 0xE0, // 0xE0 값 추가
+	SPECIAL2 = 0x00  // 0x00 값 추가
+};
+
 int main() {
 	srand(time(NULL));
 	textcolor(YELLOW, BLACK); //컬러 지정
