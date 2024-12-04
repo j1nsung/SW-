@@ -37,6 +37,7 @@ int Enermy_Bullet_Use = 1;
 int Enermy_Bullet_frame_sync = 15;
 void Enermy_Move();
 void EnermyBullet_Show();
+int score = 0;
 
 
 struct
@@ -204,22 +205,22 @@ void EnermyBullet_Show() {
 	}
 }
 
-void EnemyBulletdraw(int i) {
+void EnermyBulletdraw(int i) {
 	textcolor(RED, BLACK);
 	gotoxy(Enermy_Bullet[i].x, Enermy_Bullet[i].y);
 	printf("*");
 }
-void EnemyBulleterase(int i) {
+void EnermyBulleterase(int i) {
 	gotoxy(Enermy_Bullet[i].x, Enermy_Bullet[i].y);
 	printf(" ");
 }
 
-void EnemyBulletMove() {
+void EnermyBulletMove() {
 	int random;
 	random = 1;
 	for (int i = 0; i < MAXENERMYBULLET; i++) {
 		if (Enermy_Bullet[i].exist == TRUE) {
-			EnemyBulleterase(i);
+			EnermyBulleterase(i);
 			if (Enermy_Bullet[i].y > HEIGHT - 3) {
 				Enermy_Bullet[i].exist = FALSE;
 			}
@@ -231,11 +232,28 @@ void EnemyBulletMove() {
 						Enermy_Bullet[i].x--;
 				}
 				Enermy_Bullet[i].y++;
-				EnemyBulletdraw(i);
+				EnermyBulletdraw(i);
 			}
 		}
 	}
 }
+
+void Enermy_fall() {
+	int i;
+	for (i = 0; i < MAXENERMY; i++) {
+		if (Enermy[i].exist == FALSE || Enermy[i].type == -1)
+			continue;
+		if (Enermy[i].y == Bullet[i].y && abs(Enermy[i].x - Bullet[i].x) <= 7) {
+			gotoxy(Bullet[i].x, Bullet[i].y);
+			printf("   ");
+			Bullet[i].exist = FALSE;
+			Enermy[i].type = -1;
+			score += 10;
+			break;
+		}
+	}
+}
+
 
 void Game_Start() { //게임을 시작 시키는 함수
 	unsigned char nKey;
