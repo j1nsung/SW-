@@ -38,6 +38,7 @@ int Enermy_Bullet_frame_sync = 15;
 void Enermy_Move();
 void EnermyBullet_Show();
 int score = 0;
+int heart = 1;
 
 
 struct
@@ -250,6 +251,20 @@ void Enermy_fall() {
 			Enermy[i].type = -1;
 			score += 10;
 			break;
+		}
+	}
+}
+
+void player_fall() {
+	int i;
+	for (i = 0; i < MAXENERMYBULLET; i++) {
+		if (Enermy_Bullet[i].exist == FALSE)
+			continue;
+		if (Enermy_Bullet[i].y == newy && abs(Enermy_Bullet[i].x - newx) <= 3) {
+			Enermy_Bullet[i].exist = FALSE;
+			gotoxy(Enermy_Bullet[i].x, Enermy_Bullet[i].y);
+			printf("    ");
+			heart--;
 		}
 	}
 }
